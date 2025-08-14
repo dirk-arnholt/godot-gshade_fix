@@ -1522,37 +1522,38 @@ Error ShaderCompiler::compile(RS::ShaderMode p_mode, const String &p_code, Ident
 				}
 			}
 
-		// Print the files.
-		for (const KeyValue<String, Vector<String>> &E : includes) {
-			int err_line = -1;
-			for (int i = 0; i < include_positions.size(); i++) {
-				if (include_positions[i].file == E.key) {
-					err_line = include_positions[i].line;
+			// Print the files.
+			for (const KeyValue<String, Vector<String>> &E : includes) {
+				int err_line = -1;
+				for (int i = 0; i < include_positions.size(); i++) {
+					if (include_positions[i].file == E.key) {
+						err_line = include_positions[i].line;
+					}
 				}
-			}
-			if (err_line < 0) {
-				// Skip files that don't contain errors.
-				continue;
-			}
+				if (err_line < 0) {
+					// Skip files that don't contain errors.
+					continue;
+				}
 
-			if (E.key.is_empty()) {
-				if (p_path == "") {
-					print_line("--Main Shader--");
+				if (E.key.is_empty()) {
+					if (p_path == "") {
+						print_line("--Main Shader--");
+					} else {
+						print_line("--" + p_path + "--");
+					}
 				} else {
-					print_line("--" + p_path + "--");
+					print_line("--" + E.key + "--");
 				}
-			} else {
-				print_line("--" + E.key + "--");
-			}
-			const Vector<String> &V = E.value;
-			for (int i = 0; i < V.size(); i++) {
-				if (i == err_line - 1) {
-					// Mark the error line to be visible without having to look at
-					// the trace at the end.
-					print_line(vformat("E%4d-> %s", i + 1, V[i]));
-				} else if ((i == err_line - 3) || (i == err_line - 2) || (i == err_line) || (i == err_line + 1)) {
-					// Print 4 lines around the error line.
-					print_line(vformat("%5d | %s", i + 1, V[i]));
+				const Vector<String> &V = E.value;
+				for (int i = 0; i < V.size(); i++) {
+					if (i == err_line - 1) {
+						// Mark the error line to be visible without having to look at
+						// the trace at the end.
+						print_line(vformat("E%4d-> %s", i + 1, V[i]));
+					} else if ((i == err_line - 3) || (i == err_line - 2) || (i == err_line) || (i == err_line + 1)) {
+						// Print 4 lines around the error line.
+						print_line(vformat("%5d | %s", i + 1, V[i]));
+					}
 				}
 			}
 		}
